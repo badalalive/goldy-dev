@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig host="157.245.106.83" id="3526ddc4-00b0-4001-be0e-fc9d8a4a26a5" keyPath="C:\Users\badal\Downloads\bucle.dev" port="22" customName="BUCLE" nameFormat="CUSTOM" username="root" useOpenSSHConfig="true">
+        <option name="customName" value="BUCLE" />
+      </sshConfig>
+    </configs>
+  </component>
+</project>
