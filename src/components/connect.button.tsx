@@ -54,7 +54,7 @@ export const CustomConnectButton = () => {
                                     <button
                                         onClick={openChainModal}
                                         style={{ display: 'flex', alignItems: 'center' }}
-                                        className="text-[18px] bg-white p-2 rounded-lg"
+                                        className="text-[18px] bg-white p-2 rounded-full"
                                         type="button"
                                     >
                                         {chain.hasIcon && (
@@ -79,7 +79,7 @@ export const CustomConnectButton = () => {
                                         )}
                                         {chain.name}
                                     </button>
-                                    <button onClick={openAccountModal} type="button" className="text-[18px] bg-white p-2 rounded-lg">
+                                    <button onClick={openAccountModal} type="button" className="text-[18px] bg-white p-2 rounded-full">
                                         {account.displayName}
                                         {account.displayBalance
                                             ? ` (${account.displayBalance})`

@@ -1,7 +1,7 @@
 import Content from "@/components/content";
 import NavBar from "@/components/navbar";
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import StatsContent from '@/components/stats.content';
 
 export default function Home () {
-    return (<><NavBar/><Content/></>);
+    return (<><NavBar/><Content/><StatsContent/></>);
 }
