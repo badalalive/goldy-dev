@@ -1,5 +1,4 @@
-import { ConnectButton , Theme } from '@rainbow-me/rainbowkit';
-import { CustomConnectButton } from '@/components/connect.button';
+import { CustomConnectButton } from '@/app/components/connect.button';
 
 export default function NavBar() {
     return (
