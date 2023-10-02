@@ -2,10 +2,18 @@
 import styles from './content.module.css';
 import React from 'react';
 import { ethers } from 'ethers';
-import { useAccount, useBalance } from 'wagmi';
-import { GoldyPriceOracleAddress } from '@/app/config/address/contract.address';
+import { useAccount, useBalance, useContractWrite, useWaitForTransaction } from 'wagmi';
+import {
+    EthTokenAddress, EurocTokenAddress,
+    GoldyPriceOracleAddress,
+    IcoAddress,
+    UsdcTokenAddress,
+    UsdtTokenAddress
+} from '@/app/config/address/contract.address';
 import { GoldyPriceOracleAbi } from '@/app/config/abi/goldy.price.oracle.abi';
 import { useCustomContractRead } from '@/app/utills/contract.calls.helper';
+import { Erc20TokenAbi } from '@/app/config/abi/erc20.token.abi';
+import { IcoAbi } from '@/app/config/abi/ico.abi';
 
 export default function StatsContent () {
     const { address, isConnected } = useAccount()
@@ -17,29 +25,55 @@ export default function StatsContent () {
     const { data: usdtPriceData, isError: isUsdtPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldyUSDTPrice");
     const { data: usdcPriceData, isError: isUsdcPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldyUSDCPrice");
     const { data: ethPriceData, isError: isEthPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldyETHPrice");
-
     const [isCheckedTab , setIsCheckedTab] = React.useState(true);
+    const [tokenAddress , setTokenAddress] = React.useState(UsdtTokenAddress);
     const [tokenValue , setTokenValue] = React.useState(1);
     const [tokenWeight , setTokenWeight] = React.useState(1);
     const [currencyValue , setCurrencyValue] = React.useState(0);
     const [currencyPrice , setCurrencyPrice] = React.useState("");
     const [currencyWeightedPrice , setCurrencyWeightedPrice] = React.useState("");
+    const { data, isLoading, isSuccess, error,  write } = useContractWrite({
+        address: tokenAddress,
+        abi: Erc20TokenAbi,
+        functionName: 'approve',
+    })
+    const {isSuccess: isTransactionSuccess, isFetched: isTransactionFetched} = useWaitForTransaction({
+        hash: data?.hash,
+    })
+    const { data: icoData, isLoading: isIcoLoading, isSuccess: isIcoSuccess, error: icoError,  write:icoWrite } = useContractWrite({
+        address: IcoAddress,
+        abi: IcoAbi,
+        functionName: 'buyToken',
+    })
+    const { data: icoPayableData, isLoading: isIcoPayableLoading, isSuccess: isIcoPayableSuccess, error: icoPayableError,  write:icoPayableWrite } = useContractWrite({
+        address: IcoAddress,
+        abi: IcoAbi,
+        functionName: 'buyTokenPayable',
+    })
+    React.useEffect(() => {
+        if(isSuccess && !isLoading && data && isTransactionSuccess && isTransactionFetched) {
+            console.log("Success =>", isSuccess);
+            icoWrite({
+                args: [ethers.parseUnits(String(currencyPrice), 18), currencyValue],
+            })
+        }
+    }, [isSuccess, isLoading, data, isTransactionSuccess, isTransactionFetched]);
     React.useEffect(() => {
         if (currencyValue === 0) {
-            setCurrencyPrice((parseFloat(ethers.formatUnits(String(usdtPriceData))) * tokenValue).toFixed(10));
-            setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(usdtPriceData))) * tokenWeight * 10000).toFixed(10));
-        }
-        else if (currencyValue === 1) {
             setCurrencyPrice((parseFloat(ethers.formatUnits(String(usdcPriceData))) * tokenValue).toFixed(10));
             setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(usdcPriceData))) * tokenWeight * 10000).toFixed(10));
         }
-        else if (currencyValue === 2) {
-            setCurrencyPrice((parseFloat(ethers.formatUnits(String(euroPriceData))) * tokenValue).toFixed(10));
-            setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(euroPriceData))) * tokenWeight * 10000).toFixed(10));
+        else if (currencyValue === 1) {
+            setCurrencyPrice((parseFloat(ethers.formatUnits(String(usdtPriceData))) * tokenValue).toFixed(10));
+            setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(usdtPriceData))) * tokenWeight * 10000).toFixed(10));
         }
-        else if (currencyValue === 3) {
+        else if (currencyValue === 2) {
             setCurrencyPrice((parseFloat(ethers.formatUnits(String(ethPriceData))) * tokenValue).toFixed(10));
             setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(ethPriceData))) * tokenWeight * 10000).toFixed(10));
+        }
+        else if (currencyValue === 3) {
+            setCurrencyPrice((parseFloat(ethers.formatUnits(String(euroPriceData))) * tokenValue).toFixed(10));
+            setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(euroPriceData))) * tokenWeight * 10000).toFixed(10));
         }
         }, [currencyValue, tokenValue, tokenWeight]);
     return (<>
@@ -89,11 +123,25 @@ export default function StatsContent () {
                                     <div>
                                         <p>Token Cost</p>
                                         <input type="text" value={currencyPrice} disabled className="w-[150px] bg-transparent border-b border-black focus:border-none focus-visible:border-none"/>
-                                        <select name="tokens" id="tokens" className="bg-transparent" onChange={(e) => setCurrencyValue(Number(e.target.value))}>
-                                            <option value={0}>USDT</option>
-                                            <option value={1}>USDC</option>
-                                            <option value={2}>EUROC</option>
-                                            <option value={3}>ETH</option>
+                                        <select name="tokens" id="tokens" className="bg-transparent" onChange={(e) => {
+                                            setCurrencyValue(Number(e.target.value));
+                                            if (Number(e.target.value) === 0) {
+                                                setTokenAddress(UsdcTokenAddress);
+                                            }
+                                            else if (Number(e.target.value) === 1) {
+                                                setTokenAddress(UsdtTokenAddress);
+                                            }
+                                            else if (Number(e.target.value) === 2) {
+                                                setTokenAddress(EthTokenAddress);
+                                            }
+                                            else if (Number(e.target.value) === 3) {
+                                                setTokenAddress(EurocTokenAddress);
+                                            }
+                                        }}>
+                                            <option value={1}>USDT</option>
+                                            <option value={0}>USDC</option>
+                                            <option value={3}>EUROC</option>
+                                            <option value={2}>ETH</option>
                                         </select>
                                         <p className="text-xs font-semibold">EUR {Number(ethers.formatUnits(String(euroPriceData))).toFixed(4)}</p>
                                     </div>
@@ -106,11 +154,25 @@ export default function StatsContent () {
                                     <div>
                                         <p>Token Cost</p>
                                         <input type="text" value={currencyWeightedPrice} disabled className="w-[150px] bg-transparent border-b border-black focus:border-none focus-visible:border-none"/>
-                                        <select name="tokens" id="tokens" className="bg-transparent" onChange={(e) => setCurrencyValue(Number(e.target.value))}>
-                                            <option value={0}>USDT</option>
-                                            <option value={1}>USDC</option>
-                                            <option value={2}>EUROC</option>
-                                            <option value={3}>ETH</option>
+                                        <select name="tokens" id="tokens" className="bg-transparent" onChange={(e) => {
+                                            setCurrencyValue(Number(e.target.value));
+                                            if (Number(e.target.value) === 0) {
+                                                setTokenAddress(UsdcTokenAddress);
+                                            }
+                                            else if (Number(e.target.value) === 1) {
+                                                setTokenAddress(UsdtTokenAddress);
+                                            }
+                                            else if (Number(e.target.value) === 2) {
+                                                setTokenAddress(EthTokenAddress);
+                                            }
+                                            else if (Number(e.target.value) === 3) {
+                                                setTokenAddress(EurocTokenAddress);
+                                            }
+                                        }}>
+                                            <option value={1}>USDT</option>
+                                            <option value={0}>USDC</option>
+                                            <option value={3}>EUROC</option>
+                                            <option value={2}>ETH</option>
                                         </select>
                                         <p className=" text-xs font-semibold">No of Goldy/Ounce: 10000</p>
                                     </div>
@@ -118,7 +180,19 @@ export default function StatsContent () {
                             }
                             <div className="text-center">
                                 <p className="text-xs font-bold"> Your Balance: {isBalanceError ? 'Noe Able To Fetch' : Number(balanceData?.formatted).toFixed(6) + ' ' + balanceData?.symbol}</p>
-                                <button className="mt-4 bg-black text-white px-28 py-2 rounded-md">Buy</button>
+                                <button className="mt-4 bg-black text-white px-28 py-2 rounded-md" disabled={!write}
+                                        onClick={() => {
+                                            if ( currencyValue !== 2) {
+                                                write({
+                                                    args: [ IcoAddress, ethers.parseUnits(String(currencyPrice), 18) ]
+                                                })
+                                            } else {
+                                                icoPayableWrite({
+                                                    value: ethers.parseUnits(String(currencyPrice), 18)
+                                                })
+                                            }
+                                        }
+                                        }>Buy</button>
                             </div>
                         </div>
                     </div>
