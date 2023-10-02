@@ -1,8 +1,13 @@
 'use client';
 import styles from './content.module.css';
 import React from 'react';
+import { useAccount, useBalance } from 'wagmi';
 
 export default function StatsContent () {
+    const { address, isConnected } = useAccount()
+    const { data, isError, isLoading } = useBalance({
+        address: address,
+    })
     const [isCheckedTab , setIsCheckedTab] = React.useState(true);
     return (<>
         <div className="container flex flex-row space-x-8 mb-4">
@@ -79,7 +84,7 @@ export default function StatsContent () {
                                 </div>
                             }
                             <div className="text-center">
-                                <p className="text-xs font-bold"> Your Balance: 0.683</p>
+                                <p className="text-xs font-bold"> Your Balance: {isError ? 'not able to fetch' : Number(data?.formatted).toFixed(6)+' '+data?.symbol}</p>
                                 <button className="mt-4 bg-black text-white px-28 py-2 rounded-md">Buy</button>
                             </div>
                         </div>
