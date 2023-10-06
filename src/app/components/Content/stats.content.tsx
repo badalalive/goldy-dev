@@ -17,14 +17,6 @@ import { IcoAbi } from '@/app/config/abi/ico.abi';
 
 export default function StatsContent () {
     const { address, isConnected } = useAccount()
-    const { data: balanceData, isError: isBalanceError } = useBalance({
-        address: address,
-    })
-    const { data: euroTroyPriceData, isError: isTroyEuroPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldTroyOunceEuroPrice");
-    const { data: euroPriceData, isError: isEuroPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldyEuroPrice");
-    const { data: usdtPriceData, isError: isUsdtPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldyUSDTPrice");
-    const { data: usdcPriceData, isError: isUsdcPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldyUSDCPrice");
-    const { data: ethPriceData, isError: isEthPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldyETHPrice");
     const [isCheckedTab , setIsCheckedTab] = React.useState(true);
     const [tokenAddress , setTokenAddress] = React.useState(UsdtTokenAddress);
     const [tokenValue , setTokenValue] = React.useState(1);
@@ -32,6 +24,14 @@ export default function StatsContent () {
     const [currencyValue , setCurrencyValue] = React.useState(0);
     const [currencyPrice , setCurrencyPrice] = React.useState("");
     const [currencyWeightedPrice , setCurrencyWeightedPrice] = React.useState("");
+    const { data: balanceData, isError: isBalanceError } = useBalance({
+        address: address,
+    })
+    const { data: euroTroyPriceData, isError: isTroyEuroPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldTroyOunceEuroPrice", isConnected);
+    const { data: euroPriceData, isError: isEuroPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldyEuroPrice", isConnected);
+    const { data: usdtPriceData, isError: isUsdtPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldyUSDTPrice", isConnected);
+    const { data: usdcPriceData, isError: isUsdcPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldyUSDCPrice", isConnected);
+    const { data: ethPriceData, isError: isEthPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldyETHPrice", isConnected);
     const { data, isLoading, isSuccess, error,  write } = useContractWrite({
         address: tokenAddress,
         abi: Erc20TokenAbi,
@@ -60,20 +60,20 @@ export default function StatsContent () {
     }, [isSuccess, isLoading, data, isTransactionSuccess, isTransactionFetched]);
     React.useEffect(() => {
         if (currencyValue === 0) {
-            setCurrencyPrice((parseFloat(ethers.formatUnits(String(usdcPriceData))) * tokenValue).toFixed(10));
-            setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(usdcPriceData))) * tokenWeight * 10000).toFixed(10));
+            setCurrencyPrice((parseFloat(ethers.formatUnits(String(usdcPriceData ?? 0))) * tokenValue).toFixed(10));
+            setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(usdcPriceData ?? 0))) * tokenWeight * 10000).toFixed(10));
         }
         else if (currencyValue === 1) {
-            setCurrencyPrice((parseFloat(ethers.formatUnits(String(usdtPriceData))) * tokenValue).toFixed(10));
-            setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(usdtPriceData))) * tokenWeight * 10000).toFixed(10));
+            setCurrencyPrice((parseFloat(ethers.formatUnits(String(usdtPriceData ?? 0))) * tokenValue).toFixed(10));
+            setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(usdtPriceData ?? 0))) * tokenWeight * 10000).toFixed(10));
         }
         else if (currencyValue === 2) {
-            setCurrencyPrice((parseFloat(ethers.formatUnits(String(ethPriceData))) * tokenValue).toFixed(10));
-            setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(ethPriceData))) * tokenWeight * 10000).toFixed(10));
+            setCurrencyPrice((parseFloat(ethers.formatUnits(String(ethPriceData ?? 0))) * tokenValue).toFixed(10));
+            setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(ethPriceData ?? 0))) * tokenWeight * 10000).toFixed(10));
         }
         else if (currencyValue === 3) {
-            setCurrencyPrice((parseFloat(ethers.formatUnits(String(euroPriceData))) * tokenValue).toFixed(10));
-            setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(euroPriceData))) * tokenWeight * 10000).toFixed(10));
+            setCurrencyPrice((parseFloat(ethers.formatUnits(String(euroPriceData ?? 0))) * tokenValue).toFixed(10));
+            setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(euroPriceData ?? 0))) * tokenWeight * 10000).toFixed(10));
         }
         }, [currencyValue, tokenValue, tokenWeight]);
     return (<>
@@ -84,7 +84,7 @@ export default function StatsContent () {
                     <div className="flex flex-row justify-end text-[16px] font-bold basis-2/3">
                         <p className="text-red-700">LIVE</p>&nbsp;
                         <p className="">GOLD SPOT PRICE
-                            € {Number(ethers.formatUnits(String(euroTroyPriceData))).toFixed(4)}/1 Troy Ounce</p>
+                            € {Number(ethers.formatUnits(String(euroTroyPriceData ?? 0))).toFixed(4)}/1 Troy Ounce</p>
                     </div>
                 </div>
                 <div className="flex flex-row justify-end text-xs"> <p>{new Date().toLocaleDateString('en-US', {
@@ -143,7 +143,7 @@ export default function StatsContent () {
                                             <option value={3}>EUROC</option>
                                             <option value={2}>ETH</option>
                                         </select>
-                                        <p className="text-xs font-semibold">EUR {Number(ethers.formatUnits(String(euroPriceData))).toFixed(4)}</p>
+                                        <p className="text-xs font-semibold">EUR {Number(ethers.formatUnits(String(euroPriceData ?? 0))).toFixed(4)}</p>
                                     </div>
                                 </div> :
                                 <div className="mt-6 flex flex-row space-x-4">
@@ -179,7 +179,7 @@ export default function StatsContent () {
                                 </div>
                             }
                             <div className="text-center">
-                                <p className="text-xs font-bold"> Your Balance: {isBalanceError ? 'Noe Able To Fetch' : Number(balanceData?.formatted).toFixed(6) + ' ' + balanceData?.symbol}</p>
+                                <p className="text-xs font-bold"> Your Balance: {isBalanceError ? 'Noe Able To Fetch' : Number(balanceData?.formatted ?? 0).toFixed(6) + ' ' + (balanceData?.symbol ?? ' ')}</p>
                                 <button className="mt-4 bg-black text-white px-28 py-2 rounded-md" disabled={!write}
                                         onClick={() => {
                                             if ( currencyValue !== 2) {
