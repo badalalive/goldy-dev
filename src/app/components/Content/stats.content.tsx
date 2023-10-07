@@ -11,9 +11,11 @@ import {
     UsdtTokenAddress
 } from '@/app/config/address/contract.address';
 import { GoldyPriceOracleAbi } from '@/app/config/abi/goldy.price.oracle.abi';
-import { useCustomContractRead } from '@/app/utills/contract.calls.helper';
+import { useCustomContractRead, useCustomContractReadWithArg } from '@/app/utills/contract.calls.helper';
 import { Erc20TokenAbi } from '@/app/config/abi/erc20.token.abi';
 import { IcoAbi } from '@/app/config/abi/ico.abi';
+import { getCurrency } from '@/app/utills/common.util';
+import Spinner from '@/app/components/Loader/spinner.loader';
 
 export default function StatsContent () {
     const { address, isConnected } = useAccount()
@@ -21,23 +23,27 @@ export default function StatsContent () {
     const [tokenAddress , setTokenAddress] = React.useState(UsdtTokenAddress);
     const [tokenValue , setTokenValue] = React.useState(1);
     const [tokenWeight , setTokenWeight] = React.useState(1);
-    const [currencyValue , setCurrencyValue] = React.useState(0);
+    const [currencyValue , setCurrencyValue] = React.useState(1);
     const [currencyPrice , setCurrencyPrice] = React.useState("");
+    const [currencyBalance , setCurrencyBalance] = React.useState("");
     const [currencyWeightedPrice , setCurrencyWeightedPrice] = React.useState("");
     const { data: balanceData, isError: isBalanceError } = useBalance({
         address: address,
     })
+    const { data: usdtBalance, isError: isUsdtBalanceError } = useCustomContractReadWithArg(UsdtTokenAddress, Erc20TokenAbi, "balanceOf", [address], isConnected);
+    const { data: usdcBalance, isError: isUsdcBalanceError } = useCustomContractReadWithArg(UsdcTokenAddress, Erc20TokenAbi, "balanceOf", [address],isConnected);
+    const { data: eurocBalance, isError: isEurocBalanceError } = useCustomContractReadWithArg(EurocTokenAddress, Erc20TokenAbi, "balanceOf", [address],isConnected);
     const { data: euroTroyPriceData, isError: isTroyEuroPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldTroyOunceEuroPrice", isConnected);
     const { data: euroPriceData, isError: isEuroPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldyEuroPrice", isConnected);
     const { data: usdtPriceData, isError: isUsdtPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldyUSDTPrice", isConnected);
     const { data: usdcPriceData, isError: isUsdcPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldyUSDCPrice", isConnected);
     const { data: ethPriceData, isError: isEthPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldyETHPrice", isConnected);
-    const { data, isLoading, isSuccess, error,  write } = useContractWrite({
+       const { data, isLoading, isSuccess, error,  write } = useContractWrite({
         address: tokenAddress,
         abi: Erc20TokenAbi,
         functionName: 'approve',
     })
-    const {isSuccess: isTransactionSuccess, isFetched: isTransactionFetched} = useWaitForTransaction({
+    const {isSuccess: isTransactionSuccess, isFetched: isTransactionFetched, isLoading: isTransactionLoading} = useWaitForTransaction({
         hash: data?.hash,
     })
     const { data: icoData, isLoading: isIcoLoading, isSuccess: isIcoSuccess, error: icoError,  write:icoWrite } = useContractWrite({
@@ -62,24 +68,29 @@ export default function StatsContent () {
         if (currencyValue === 0) {
             setCurrencyPrice((parseFloat(ethers.formatUnits(String(usdcPriceData ?? 0))) * tokenValue).toFixed(10));
             setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(usdcPriceData ?? 0))) * tokenWeight * 10000).toFixed(10));
+            setCurrencyBalance((parseFloat(ethers.formatUnits(String(usdcBalance ?? 0))) * tokenValue).toFixed(10));
         }
         else if (currencyValue === 1) {
             setCurrencyPrice((parseFloat(ethers.formatUnits(String(usdtPriceData ?? 0))) * tokenValue).toFixed(10));
             setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(usdtPriceData ?? 0))) * tokenWeight * 10000).toFixed(10));
+            setCurrencyBalance((parseFloat(ethers.formatUnits(String(usdtBalance ?? 0))) * tokenValue).toFixed(10));
         }
         else if (currencyValue === 2) {
             setCurrencyPrice((parseFloat(ethers.formatUnits(String(ethPriceData ?? 0))) * tokenValue).toFixed(10));
             setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(ethPriceData ?? 0))) * tokenWeight * 10000).toFixed(10));
+            setCurrencyBalance(Number(balanceData?.formatted ?? 0).toFixed(6));
         }
         else if (currencyValue === 3) {
             setCurrencyPrice((parseFloat(ethers.formatUnits(String(euroPriceData ?? 0))) * tokenValue).toFixed(10));
             setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(euroPriceData ?? 0))) * tokenWeight * 10000).toFixed(10));
+            setCurrencyBalance((parseFloat(ethers.formatUnits(String(eurocBalance ?? 0))) * tokenValue).toFixed(10));
         }
-        }, [currencyValue, tokenValue, tokenWeight]);
+        }, [currencyValue, tokenValue, tokenWeight, currencyBalance]);
     return (<>
         <div className="container flex flex-row space-x-8 mb-4">
-            <div className="container bg-gradient-to-r from-[#be9f59] to-[#433420] rounded-md p-7 basis-2/3">
-                <div className="flex flex-row items-center">
+            <div className={`container bg-gradient-to-r from-[#be9f59] to-[#433420] rounded-md p-7 basis-2/3`}>
+                {!isConnected ? <span>Wallet not Connected</span> : <>
+                    <div className="flex flex-row items-center">
                     <div className="text-[24px] font-semibold basis-1/3"><p>Join The Presale</p></div>
                     <div className="flex flex-row justify-end text-[16px] font-bold basis-2/3">
                         <p className="text-red-700">LIVE</p>&nbsp;
@@ -87,7 +98,7 @@ export default function StatsContent () {
                             € {Number(ethers.formatUnits(String(euroTroyPriceData ?? 0))).toFixed(4)}/1 Troy Ounce</p>
                     </div>
                 </div>
-                <div className="flex flex-row justify-end text-xs"> <p>{new Date().toLocaleDateString('en-US', {
+                    <div className="flex flex-row justify-end text-xs"> <p>{new Date().toLocaleDateString('en-US', {
                 weekday: 'short',
                 day: 'numeric',
                 month: 'short',
@@ -96,7 +107,7 @@ export default function StatsContent () {
                 minute: '2-digit',
                 second: '2-digit',
             })}</p></div>
-                <div className="flex flex-col mt-1">
+                    <div className="flex flex-col mt-1">
                     <div>
                         <p className="font-semibold text-lg">Choose Tokens</p>
                         <div className="container flex flex-row space-x-3 pt-1">
@@ -140,8 +151,8 @@ export default function StatsContent () {
                                         }}>
                                             <option value={1}>USDT</option>
                                             <option value={0}>USDC</option>
-                                            <option value={3}>EUROC</option>
                                             <option value={2}>ETH</option>
+                                            <option value={3}>EUROC</option>
                                         </select>
                                         <p className="text-xs font-semibold">EUR {Number(ethers.formatUnits(String(euroPriceData ?? 0))).toFixed(4)}</p>
                                     </div>
@@ -179,8 +190,8 @@ export default function StatsContent () {
                                 </div>
                             }
                             <div className="text-center">
-                                <p className="text-xs font-bold"> Your Balance: {isBalanceError ? 'Noe Able To Fetch' : Number(balanceData?.formatted ?? 0).toFixed(6) + ' ' + (balanceData?.symbol ?? ' ')}</p>
-                                <button className="mt-4 bg-black text-white px-28 py-2 rounded-md" disabled={!write}
+                                <p className="text-xs font-bold"> Your Balance: {currencyBalance} {getCurrency(currencyValue)}</p>
+                                <button className="mt-4 bg-black text-white px-28 py-2 rounded-md" disabled={!write || !icoWrite || !icoPayableWrite || isIcoLoading || isLoading || isIcoPayableLoading}
                                         onClick={() => {
                                             if ( currencyValue !== 2) {
                                                 write({
@@ -192,14 +203,16 @@ export default function StatsContent () {
                                                 })
                                             }
                                         }
-                                        }>Buy</button>
+                                        }>{isLoading || isIcoLoading || isIcoPayableLoading || isTransactionLoading ? <Spinner/> : 'Buy'}</button>
                             </div>
                         </div>
                     </div>
                 </div>
                 </div>
+                    </>
+                }
             </div>
-            <div className="container basis-1/3 bg-gradient-to-r from-[#be9f59] to-[#433420] rounded-md p-7">jdbsjdsjdb</div>
+            <div className={`container basis-1/3 bg-gradient-to-r from-[#be9f59] to-[#433420] rounded-md p-7`}>jdbsjdsjdb</div>
         </div>
     </>);
 }

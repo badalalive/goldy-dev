@@ -9,11 +9,13 @@ export const useCustomContractRead = (address: any, abi: any, functionName: any,
         enabled: enable
     });
 };
-export const useCustomContractReadWithArg = (address: any, abi: any, functionName: any, args: any[]) => {
+export const useCustomContractReadWithArg = (address: any, abi: any, functionName: any, args: any[], enable: boolean) => {
     return useContractRead({
         address: address,
         abi: abi,
         functionName,
-        args: args
+        args: args,
+        enabled: enable
     });
 };
+
