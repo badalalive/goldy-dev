@@ -1,3 +1,5 @@
+import {ethers} from "ethers";
+
 export const getCurrency = (value: number): string | undefined => {
     const currencyMap: { [key: number]: string } = {
         1: 'USDT',
@@ -8,3 +10,14 @@ export const getCurrency = (value: number): string | undefined => {
 
     return currencyMap[value];
 };
+
+export const formatEtherToFloat = (value: any) => {
+    return parseFloat(ethers.formatUnits(String(value)));
+}
+
+export const formatNumber = (number: number) => {
+    const numberStr = number.toString();
+    const [integerPart, decimalPart] = numberStr.split('.');
+    const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return decimalPart ? `${formattedIntegerPart}.${decimalPart}` : formattedIntegerPart;
+}

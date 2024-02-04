@@ -5,10 +5,10 @@ export default function NavBar() {
         <div>
             <nav className="mt-9 container flex items-center justify-center">
                 <div className="container flex space-x-16 items-center">
-                    <a href="#" className=""><img src='/goldy_logo.svg' className="w-44" alt='logo'/></a>
+                    <a href="/" className=""><img src='/goldy_logo.svg' className="w-44" alt='logo'/></a>
                     <ul className="flex space-x-12">
-                        <li><a href="#" className="text-white text-[18px] hover:text-gray-400">Portfolio</a></li>
-                        <li><a href="#" className="text-white text-[18px] hover:text-gray-400">Contact Us</a></li>
+                        <li><a href="/portfolio" className="text-white text-[18px] hover:text-gray-400">Portfolio</a></li>
+                        <li><a href="/contact-us" className="text-white text-[18px] hover:text-gray-400">Contact Us</a></li>
                     </ul>
                 </div>
                 <div className="container flex justify-end space-x-4">
