@@ -14,7 +14,7 @@ import { GoldyPriceOracleAbi } from '@/app/config/abi/goldy.price.oracle.abi';
 import { useCustomContractRead, useCustomContractReadWithArg } from '@/app/utills/contract.calls.helper';
 import { Erc20TokenAbi } from '@/app/config/abi/erc20.token.abi';
 import { IcoAbi } from '@/app/config/abi/ico.abi';
-import { getCurrency } from '@/app/utills/common.util';
+import {formatEtherToFloat, getCurrency} from '@/app/utills/common.util';
 import Spinner from '@/app/components/Loader/spinner.loader';
 
 export default function StatsContent () {
@@ -66,24 +66,24 @@ export default function StatsContent () {
     }, [isSuccess, isLoading, data, isTransactionSuccess, isTransactionFetched]);
     React.useEffect(() => {
         if (currencyValue === 0) {
-            setCurrencyPrice((parseFloat(ethers.formatUnits(String(usdcPriceData ?? 0))) * tokenValue).toFixed(10));
-            setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(usdcPriceData ?? 0))) * tokenWeight * 10000).toFixed(10));
-            setCurrencyBalance((parseFloat(ethers.formatUnits(String(usdcBalance ?? 0))) * tokenValue).toFixed(10));
+            setCurrencyPrice((formatEtherToFloat(usdcPriceData ?? 0) * tokenValue).toFixed(10));
+            setCurrencyWeightedPrice((formatEtherToFloat(usdcPriceData ?? 0) * tokenWeight * 10000).toFixed(10));
+            setCurrencyBalance((formatEtherToFloat(usdcBalance ?? 0) * tokenValue).toFixed(10));
         }
         else if (currencyValue === 1) {
-            setCurrencyPrice((parseFloat(ethers.formatUnits(String(usdtPriceData ?? 0))) * tokenValue).toFixed(10));
-            setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(usdtPriceData ?? 0))) * tokenWeight * 10000).toFixed(10));
-            setCurrencyBalance((parseFloat(ethers.formatUnits(String(usdtBalance ?? 0))) * tokenValue).toFixed(10));
+            setCurrencyPrice((formatEtherToFloat(usdtPriceData ?? 0) * tokenValue).toFixed(10));
+            setCurrencyWeightedPrice((formatEtherToFloat(usdtPriceData ?? 0) * tokenWeight * 10000).toFixed(10));
+            setCurrencyBalance((formatEtherToFloat(usdtBalance ?? 0) * tokenValue).toFixed(10));
         }
         else if (currencyValue === 2) {
-            setCurrencyPrice((parseFloat(ethers.formatUnits(String(ethPriceData ?? 0))) * tokenValue).toFixed(10));
-            setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(ethPriceData ?? 0))) * tokenWeight * 10000).toFixed(10));
+            setCurrencyPrice((formatEtherToFloat(ethPriceData ?? 0) * tokenValue).toFixed(10));
+            setCurrencyWeightedPrice((formatEtherToFloat(ethPriceData ?? 0) * tokenWeight * 10000).toFixed(10));
             setCurrencyBalance(Number(balanceData?.formatted ?? 0).toFixed(6));
         }
         else if (currencyValue === 3) {
-            setCurrencyPrice((parseFloat(ethers.formatUnits(String(euroPriceData ?? 0))) * tokenValue).toFixed(10));
-            setCurrencyWeightedPrice((parseFloat(ethers.formatUnits(String(euroPriceData ?? 0))) * tokenWeight * 10000).toFixed(10));
-            setCurrencyBalance((parseFloat(ethers.formatUnits(String(eurocBalance ?? 0))) * tokenValue).toFixed(10));
+            setCurrencyPrice((formatEtherToFloat(euroPriceData ?? 0) * tokenValue).toFixed(10));
+            setCurrencyWeightedPrice((formatEtherToFloat(euroPriceData ?? 0) * tokenWeight * 10000).toFixed(10));
+            setCurrencyBalance((formatEtherToFloat(eurocBalance ?? 0) * tokenValue).toFixed(10));
         }
         }, [currencyValue, tokenValue, tokenWeight, currencyBalance]);
     return (<>
