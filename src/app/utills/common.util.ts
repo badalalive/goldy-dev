@@ -16,8 +16,7 @@ export const formatEtherToFloat = (value: any) => {
 }
 
 export const formatNumber = (number: number) => {
-    const numberStr = number.toString();
+    const numberStr = number.toFixed(2); // Ensure two decimal places
     const [integerPart, decimalPart] = numberStr.split('.');
     const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return decimalPart ? `${formattedIntegerPart}.${decimalPart}` : formattedIntegerPart;
-}
+    return `${formattedIntegerPart}.${decimalPart}`;}
