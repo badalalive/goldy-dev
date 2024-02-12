@@ -2,7 +2,9 @@ import './globals.css'
 import '@rainbow-me/rainbowkit/styles.css';
 import type { Metadata } from 'next'
 import { Providers } from './providers'
-
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import { config } from "@fortawesome/fontawesome-svg-core";
+config.autoAddCss = false;
 
 export const metadata: Metadata = {
   title: 'Goldy Dev',
@@ -16,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-[#0D0907] mx-12">       
+      <body className="bg-[#1E1E1E] mx-12">
        <Providers>{children}</Providers>
        </body>
     </html>

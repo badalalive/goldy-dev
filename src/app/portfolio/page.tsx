@@ -1,9 +1,8 @@
-import Content from "@/app/components/Content/content";
 import NavBar from "@/app/components/Navbar/navbar";
-import StatsContent from '@/app/components/Content/stats.content';
 import Vesting from "@/app/components/Portfolio/vesting";
 import StakeState from "@/app/components/Portfolio/stake-state";
+import Footer from "@/app/components/Footer/footer";
 
-export default function Portfolio () {
-    return (<><NavBar/><Vesting/><StakeState/></>);
+export default function PortfolioPage () {
+    return (<><NavBar/><Vesting/><StakeState/><Footer/></>);
 }

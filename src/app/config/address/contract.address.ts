@@ -4,3 +4,6 @@ export const UsdcTokenAddress: any = "0x79717dBe678C0204a4Fcb7B3fAc22B1773C2cd41
 export const EurocTokenAddress: any = "0x85fBC828927dD6357692aCc9B981f1215886A028";
 export const EthTokenAddress: any = "0x0000000000000000000000000000000000000000";
 export const IcoAddress: any = "0xb2F2fFa2E07026888c9f8068574f7Ed50f86bd7C";
+export const GoldyAddress: any = "0x190B9503caC17695112E83B8BA8dc58C8eea447A";
+
+export const VestingAddress: any = "0xf452c85a073cd8597a470606d27676a149d48f3c";

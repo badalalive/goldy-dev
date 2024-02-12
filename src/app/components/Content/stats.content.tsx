@@ -4,7 +4,7 @@ import React from 'react';
 import { ethers } from 'ethers';
 import { useAccount, useBalance, useContractWrite, useWaitForTransaction } from 'wagmi';
 import {
-    EthTokenAddress, EurocTokenAddress,
+    EthTokenAddress, EurocTokenAddress, GoldyAddress,
     GoldyPriceOracleAddress,
     IcoAddress,
     UsdcTokenAddress,
