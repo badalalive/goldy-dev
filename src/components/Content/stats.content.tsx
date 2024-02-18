@@ -9,13 +9,13 @@ import {
     IcoAddress,
     UsdcTokenAddress,
     UsdtTokenAddress
-} from '@/app/config/address/contract.address';
-import { GoldyPriceOracleAbi } from '@/app/config/abi/goldy.price.oracle.abi';
-import { useCustomContractRead, useCustomContractReadWithArg } from '@/app/utills/contract.calls.helper';
-import { Erc20TokenAbi } from '@/app/config/abi/erc20.token.abi';
-import { IcoAbi } from '@/app/config/abi/ico.abi';
-import {formatEtherToFloat, getCurrency} from '@/app/utills/common.util';
-import Spinner from '@/app/components/Loader/spinner.loader';
+} from '@/config/address/contract.address';
+import { GoldyPriceOracleAbi } from '@/config/abi/goldy.price.oracle.abi';
+import { useCustomContractRead, useCustomContractReadWithArg } from '@/utills/contract.calls.helper';
+import { Erc20TokenAbi } from '@/config/abi/erc20.token.abi';
+import { IcoAbi } from '@/config/abi/ico.abi';
+import {formatEtherToFloat, getCurrency} from '@/utills/common.util';
+import Spinner from '@/components/Loader/spinner.loader';
 
 export default function StatsContent () {
     const { address, isConnected } = useAccount()

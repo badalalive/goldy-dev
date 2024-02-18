@@ -6,4 +6,4 @@ export const EthTokenAddress: any = "0x0000000000000000000000000000000000000000"
 export const IcoAddress: any = "0xb2F2fFa2E07026888c9f8068574f7Ed50f86bd7C";
 export const GoldyAddress: any = "0x190B9503caC17695112E83B8BA8dc58C8eea447A";
 
-export const VestingAddress: any = "0xf452c85a073cd8597a470606d27676a149d48f3c";
+export const VestingAddress: any = "0x9bc1a2382b0252eaa05f2ac5c7dbe1e50431a366";

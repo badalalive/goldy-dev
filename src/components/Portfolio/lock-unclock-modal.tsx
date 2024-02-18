@@ -1,7 +1,7 @@
-import {formatEtherToFloat, formatNumber} from "@/app/utills/common.util";
+import {formatEtherToFloat, formatNumber} from "@/utills/common.util";
 import Link from "next/link";
 import React from "react";
-import Spinner from "@/app/components/Loader/spinner.loader";
+import Spinner from "@/components/Loader/spinner.loader";
 
 interface LockUnlockModalProps {
     title: string,
@@ -10,6 +10,7 @@ interface LockUnlockModalProps {
     buttonName: string,
     approvalAction: (value: string) => void,
     createAction: (value: string, time: number) => void,
+    withdrawAction: (value: string) => void,
     status: boolean,
     isLoading: boolean,
     isVestingLoading: boolean,
@@ -23,8 +24,8 @@ export default function LockUnlockModal (props: LockUnlockModalProps) {
     console.log("isVestingLoading =>", props.isVestingLoading);
     React.useEffect(() => {
         if(props.status && !props.isLoading) {
-            console.log("Success =>", props.status, Math.floor((new Date().getTime() + 5 * 60 * 1000) / 1000));
-            props.createAction(amount, Math.floor((new Date().getTime() + 5 * 60 * 1000) / 1000));
+            console.log("Success =>", props.status, Math.floor((new Date().getTime() + 10 * 60 * 1000) / 1000));
+            props.createAction(amount, Math.floor((new Date().getTime() + 10 * 60 * 1000) / 1000));
         }
     },[props.status, props.isLoading, props.isTransactionLoading]);
     return (

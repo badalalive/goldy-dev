@@ -1,4 +1,4 @@
-import { CustomConnectButton } from '@/app/components/WalletConnect/connect.button';
+import { CustomConnectButton } from '@/components/WalletConnect/connect.button';
 
 export default function NavBar() {
     return (

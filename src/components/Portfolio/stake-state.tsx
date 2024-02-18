@@ -1,13 +1,18 @@
 'use client';
-import {formatEtherToFloat, formatNumber} from "@/app/utills/common.util";
-import {useCustomContractRead, useCustomContractReadWithArg} from "@/app/utills/contract.calls.helper";
-import {GoldyAddress, GoldyPriceOracleAddress, VestingAddress} from "@/app/config/address/contract.address";
-import {Erc20TokenAbi} from "@/app/config/abi/erc20.token.abi";
+import {formatEtherToFloat, formatNumber} from "@/utills/common.util";
+import {useCustomContractRead, useCustomContractReadWithArg} from "@/utills/contract.calls.helper";
+import {GoldyAddress, GoldyPriceOracleAddress, VestingAddress} from "@/config/address/contract.address";
+import {Erc20TokenAbi} from "@/config/abi/erc20.token.abi";
 import {useAccount} from "wagmi";
-import {GoldyPriceOracleAbi} from "@/app/config/abi/goldy.price.oracle.abi";
-import {VestingAbi} from "@/app/config/abi/vesting.abi";
+import {GoldyPriceOracleAbi} from "@/config/abi/goldy.price.oracle.abi";
+import {VestingAbi} from "@/config/abi/vesting.abi";
 
-export default function StakeState() {
+
+interface StakeStateProps {
+    locked: number
+}
+
+export default function StakeState(props: StakeStateProps) {
     const { address, isConnected } = useAccount();
     const { data: goldyBalance, isError: isGoldyBalanceError } = useCustomContractReadWithArg(GoldyAddress, Erc20TokenAbi, "balanceOf", [address], isConnected);
     const { data: usdtPriceData, isError: isUsdtPriceError } = useCustomContractRead(GoldyPriceOracleAddress, GoldyPriceOracleAbi, "getGoldyUSDTPrice", isConnected);
@@ -22,7 +27,7 @@ export default function StakeState() {
                     <div className="container basis-2/3">
                         <p className="text-[#FFE082] text-xl">Stakes</p>
                         <p className="font-bold text-xl my-2">Your Balance: {formatNumber(formatEtherToFloat(goldyBalance ?? 0))} Goldy</p>
-                        <p>Locked tokens: {formatNumber(0)}</p>
+                        <p>Locked tokens: {formatNumber(props.locked ?? 0)}</p>
                         <p className="my-2">Value of <span className="text-[#FFE082]">Goldy</span></p>
                         <p>USDT = ${formatNumber(Number((formatEtherToFloat(usdtPriceData ?? 0) * formatEtherToFloat(goldyBalance ?? 0)).toFixed(10)))}</p>
                         <p>Physical Gold = {formatNumber(formatEtherToFloat(goldyBalance ?? 0) / 10000)  } Ounce</p>
